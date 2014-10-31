@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 SIGNIN_URL = "https://accounts.coursera.org/signin"
 TIMEOUT = 60
 
+
 def signin(web, username, password):
     """
     Sign in with `username` and `password`

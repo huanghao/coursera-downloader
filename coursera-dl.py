@@ -57,7 +57,7 @@ def parse_args():
     if not args.user or not args.password:
         args.user, args.password = from_netrc()
     if not args.user or not args.password:
-        print >> sys.stderr, "Can't find credentials, please use --user and --password."
+        print >> sys.stderr, "Can't find credentials, see -u and -p."
         sys.exit(1)
 
     if not args.output_dir:
@@ -70,10 +70,8 @@ def parse_args():
 
     if not args.proxy and 'http_proxy' in os.environ:
         args.proxy = os.environ['http_proxy']
- 
-    return args
 
-    # eefun-002
+    return args
 
 
 if __name__ == '__main__':
