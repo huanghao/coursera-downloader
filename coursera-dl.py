@@ -23,12 +23,11 @@ def main():
     args = parse_args()
     os.chdir(args.output_dir)
 
-    '''
-    cookie = format_cookie(
-        get_cookie(args.user, args.password, args.proxy))
-    with open('cookie', 'w') as file:
-        file.write(cookie)
-    '''
+    if not os.path.exists('cookie'):
+        cookie = format_cookie(
+            get_cookie(args.user, args.password, args.proxy))
+        with open('cookie', 'w') as file:
+            file.write(cookie)
 
     url = LECTURE_URL % args.course_id
     with open('url', 'w') as file:
