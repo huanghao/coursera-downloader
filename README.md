@@ -12,4 +12,5 @@ NOTES:
 * It uses chromedriver and your user/pass to simulate signin process
 
 TODO:
-* Use phantomjs rather than chrome
+* use phantomjs rather than chrome
+* use pyquery rather than beautifulsoap
