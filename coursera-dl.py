@@ -1,11 +1,12 @@
 import os
 import sys
+import json
 import netrc
 import argparse
 import subprocess
 
 from cdl.signin import get_cookie, format_cookie
-from cdl.parser import parse
+from cdl.parser import parse, generate_download_script
 
 LECTURE_URL = 'https://class.coursera.org/%s/lecture'
 
@@ -24,10 +25,12 @@ def main():
     os.chdir(args.output_dir)
 
     if not os.path.exists('cookie'):
-        cookie = format_cookie(
-            get_cookie(args.user, args.password, args.proxy))
+        cookie = get_cookie(args.user, args.password, args.proxy)
+        cookie_string = format_cookie(cookie)
         with open('cookie', 'w') as file:
-            file.write(cookie)
+            file.write(cookie_string)
+        with open('cookie.json', 'w') as file:
+            json.dump(cookie, file)
 
     url = LECTURE_URL % args.course_id
     with open('url', 'w') as file:
@@ -37,12 +40,24 @@ def main():
     subprocess.call(cmd, shell=True)
 
     with open('index') as file:
-        codes = parse(file.read())
+        result = parse(file.read())
 
+    toc = []
+    for chapter, content in result:
+        toc.append(chapter.encode('utf8'))
+        for lecture, links in content:
+            toc.append('- ' + lecture.encode('utf8'))
+        toc.append('')
+    toc = os.linesep.join(toc)
+    with open('toc', 'w') as file:
+        file.write(toc)
+
+    codes = generate_download_script(result)
     with open('download.sh', 'w') as file:
         file.write(os.linesep.join(codes))
 
-    subprocess.call(['bash', '-x', 'download.sh'])
+    if not args.dry_run:
+        subprocess.call(['bash', '-x', 'download.sh'])
 
 
 def parse_args():
@@ -51,6 +66,7 @@ def parse_args():
     parser.add_argument('-p', '--password')
     parser.add_argument('--proxy')
     parser.add_argument('-O', '--output-dir')
+    parser.add_argument('-D', '--dry-run', action='store_true')
     parser.add_argument('course_id')
     args = parser.parse_args()
 
