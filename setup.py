@@ -1,13 +1,11 @@
 #!/usr/bin/env python
-#from distribute_setup import use_setuptools
-#use_setuptools()
-from setuptools import setup
+from setuptools import setup, find_packages
 import sys
 
-setup(name='coursera-tools',
-      version='0.1',
-      scripts=[
-        'coursera_wget.sh',
-        'coursera_parse.py',
-       ],
-     )
+setup(
+    name='coursera-downloader',
+    version='0.1',
+    packages=find_packages(),
+    scripts=[
+        'coursera-dl.py',
+    ])

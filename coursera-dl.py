@@ -1,5 +1,3 @@
-#!/bin/bash
-
 indexfile=index
 cookiefile=cookie
 [ -z "$cookiefile" ] && echo "Can't find cookie" && exit 1
