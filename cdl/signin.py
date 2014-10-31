@@ -1,5 +1,3 @@
-import argparse
-
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait as wait
@@ -7,7 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 SIGNIN_URL = "https://accounts.coursera.org/signin"
-TIMEOUT = 120
+TIMEOUT = 60
 
 def signin(web, username, password):
     """
@@ -31,43 +29,20 @@ def signin(web, username, password):
     return web.get_cookies()
 
 
-def get_cookie(args):
+def get_cookie(username, password, proxy):
     """
     Launch a chrome to get cookies
     """
     chromeopts = ChromeOptions()
-    if args.proxy:
-        chromeopts.add_argument('--proxy-server=%s' % args.proxy)
+    if proxy:
+        chromeopts.add_argument('--proxy-server=%s' % proxy)
+
     web = Chrome(chrome_options=chromeopts)
     try:
-        return signin(web, args.user, args.password)
+        return signin(web, username, password)
     finally:
         web.quit()
 
 
-def main():
-    args = parse_args()
-
-    cookie = get_cookie(args)
-    cookie_string = ' '.join(['%s=%s;' % (c['name'], c['value'])
-        for c in cookie])
-
-    if args.output:
-        with open(args.output, 'w') as file:
-            file.write(cookie_string)
-        print 'Write COOKIE to', args.output
-    else:
-        print 'COOKIE:', cookie_string
-
-
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('user')
-    parser.add_argument('password')
-    parser.add_argument('--proxy')
-    parser.add_argument('-O', '--output')
-    return parser.parse_args()
-
-
-if __name__ == '__main__':
-    main()
+def format_cookie(cookie):
+    return ' '.join(['%s=%s;' % (c['name'], c['value']) for c in cookie])
