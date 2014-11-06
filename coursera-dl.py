@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import sys
 import json
@@ -12,11 +13,13 @@ LECTURE_URL = 'https://class.coursera.org/%s/lecture'
 
 
 def from_netrc():
-    rc = netrc.netrc(os.path.expanduser('~/.netrc'))
-    for key in ('accounts.coursera.org', 'coursera.org'):
-        if key in rc.hosts:
-            login, _, password = rc.hosts[key]
-            return login, password
+    filename = os.path.expanduser('~/.netrc')
+    if os.path.exists(filename):
+        rc = netrc.netrc(filename)
+        for key in ('accounts.coursera.org', 'coursera.org'):
+            if key in rc.hosts:
+                login, _, password = rc.hosts[key]
+                return login, password
     return None, None
 
 
@@ -73,7 +76,10 @@ def parse_args():
     if not args.user or not args.password:
         args.user, args.password = from_netrc()
     if not args.user or not args.password:
-        print >> sys.stderr, "Can't find credentials, see -u and -p."
+        print >> sys.stderr, """Can't find credentials, see -u and -p.
+
+Or you can add line like this into your ~/.netrc file:
+    machine acounts.coursera.org login <email> password <pass>"""
         sys.exit(1)
 
     if not args.output_dir:
