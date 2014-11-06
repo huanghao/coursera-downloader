@@ -1,5 +1,4 @@
 import os
-import re
 import urllib
 import string
 from urlparse import urlparse
@@ -18,7 +17,7 @@ def parse(html):
             a = li.find('a.lecture-link')
             lecture = a.text().strip()
             links = [pq(k).attr('href') for k in a.nextAll(
-                    '.course-lecture-item-resource').eq(0).find('a')]
+                '.course-lecture-item-resource').eq(0).find('a')]
             section.append((lecture, tuple(links)))
         res.append((chapter, section))
     return res
@@ -37,12 +36,14 @@ def generate_download_script(res):
   wget --no-cookies --header "Cookie: $(cat cookie)" '%s' -O '%s'
 fi''' % (fname, href, fname)
 
-    for ci, (chapter, content) in enumerate(res):
-        path = '%02d_%s' % (ci+1, esc(chapter.encode('utf8')))
+    for chapter, content in res:
+        path = esc(chapter.encode('utf8'))
         yield "mkdir '%s'" % path
 
-        for li, (lecture, links) in enumerate(content):
-            name = os.path.join(path, '%02d_%s' % (li+1, esc(lecture.encode('utf8'))))
+        for lecture, links in content:
+            name = os.path.join(path, esc(lecture.encode('utf8')))
+            if not links:
+                break
 
             video = links[-1]
             _, ext = os.path.splitext(urlparse(video).path)
